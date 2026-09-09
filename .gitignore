@@ -96,3 +96,38 @@ br-paint4-match.bitreplay
 
 # Private champion source, copied in by exp/build_champion.sh. Never commit.
 exp/champion/
+
+# Single-pod local build and episodes
+/singlepod/ctf
+/singlepod/.nimcache/
+/singlepod/runs/
+
+# Repository-local Nimby dependencies
+/bitworld/
+/paddy/
+/taggy/
+/pixie/
+/silky/
+/whisky/
+/windy/
+/mummy/
+/supersnappy/
+/webby/
+/curly/
+/libcurl/
+/chroma/
+/flatty/
+/zippy/
+/bumpy/
+/vmath/
+/crunchy/
+/nimsimd/
+/jsony/
+/shady/
+/urlly/
+/ws/
+/opengl/
+/fluffy/
+/metal4/
+/dx12/
+/vk14/

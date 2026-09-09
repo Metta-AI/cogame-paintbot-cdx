@@ -1,23 +1,18 @@
-x-coworld-role-contexts:
-  game: &game_context ${GAME_CONTEXT:-.}
-
 services:
   game:
-    image: coworld-ctf-game:latest
-    platform: linux/amd64
+    image: cogame-paintbot-cdx:local
     build:
-      context: *game_context
+      context: .
       dockerfile: Dockerfile
-      network: host
       args:
-        NimFlags: ${GAME_NIM_FLAGS:--d:release -d:useMalloc --threads:on --opt:speed --stackTrace:on}
-        # Engine build stamp for replay headers (see Dockerfile); empty when
-        # the caller does not export it, which leaves recordings unstamped.
         SIM_SOURCES_STAMP: ${SIM_SOURCES_STAMP:-}
-  player:
-    image: coworld-ctf-baseline:latest
-    platform: linux/amd64
-    build:
-      context: *game_context
-      dockerfile: players/baseline/Dockerfile
-      network: host
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${COWORLD_WORKDIR:-./singlepod/runs/container}:/coworld
+    environment:
+      COGAME_PLAYER_SEATS_URI: file:///coworld/seats.json
+      COGAME_CONFIG_URI: file:///coworld/config.json
+      COGAME_RESULTS_URI: file:///coworld/results.json
+      COGAME_SAVE_REPLAY_URI: file:///coworld/replay.bin
+      COGAME_PLAYER_FAILURE_URI: file:///coworld/player_failure.json

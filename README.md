@@ -1,3 +1,11 @@
+# cogame-paintbot-cdx
+
+Single-pod Paintbot with isolated, file-backed WASM policies. Start with
+[single-pod build and run instructions](singlepod/README.md) and the
+[policy ABI](singlepod/PROTOCOL.md). The main package is `coworld_manifest.json`.
+
+The upstream game documentation follows.
+
 # Paintbot — AI Paintball (the Coworld CTF engine)
 
 Paintbot is paintball-flavored team tag for the Coworld platform. The players

@@ -29,7 +29,7 @@ https://github.com/treeform/nimby/releases/download/0.1.26/nimby-Linux-ARM64; \
     echo "unsupported arch: $(dpkg --print-architecture)" && exit 1; \
   fi && \
   chmod +x /usr/local/bin/nimby && \
-  nimby use 2.2.4
+  nimby use 2.2.6
 
 ENV PATH="/root/.nimby/nim/bin:$PATH"
 
@@ -66,6 +66,10 @@ RUN tools/runtime_spike/fetch_deps.sh > /tmp/runtime_deps.env && \
     --out:paintball-player \
     src/paintball_player.nim
 
+# Compile the shipped baseline from the same source as the native player.
+RUN wasi_root="$(sed -n 's/^WASI_SDK_PATH=//p' /tmp/runtime_deps.env)" && \
+  WASI_SDK_PATH="$wasi_root" nim c --hints:off singlepod/baseline_wasm.nim
+
 FROM build AS runtime-proof
 
 RUN wasmtime_root="$(sed -n 's/^WASMTIME_C_API=//p' /tmp/runtime_deps.env)" && \
@@ -88,13 +92,17 @@ CMD ["./shell-probe"]
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
-  apt-get install -y --no-install-recommends ca-certificates libcurl4 && \
+  apt-get install -y --no-install-recommends ca-certificates libcurl4 python3 python3-venv && \
   rm -rf /var/lib/apt/lists/*
 
+COPY singlepod/requirements.txt /tmp/requirements.txt
+RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt
+
 WORKDIR /workspace/ctf
+COPY --from=build /workspace/ctf/singlepod ./singlepod
 COPY --from=build /workspace/ctf/ctf /bin/ctf
 COPY --from=build /workspace/ctf/paintball-player /bin/paintball-player
 COPY --from=build /workspace/ctf/*.json ./
 COPY --from=build /workspace/ctf/data ./data
 
-CMD ["/bin/ctf"]
+CMD ["/opt/venv/bin/python", "/workspace/ctf/singlepod/host.py", "--engine", "/bin/ctf"]

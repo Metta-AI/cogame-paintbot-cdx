@@ -1,3 +1,18 @@
+# Single-pod Paintbot fork
+
+This repository is `Metta-AI/cogame-paintbot-cdx`. Its game package is
+`coworld_manifest.json`; `coworld_manifest_paintbot.json` preserves the upstream
+manifest for reference. Build and test instructions are in `singlepod/README.md`.
+
+- The game owns policy execution: never add a player container or pod.
+- Keep the baseline policy source shared with `players/baseline/baseline.nim`.
+- Build with `singlepod/build.sh`; validate with `singlepod/test.sh` and
+  `singlepod/container_smoke.py`. The first script installs isolated local
+  dependencies; avoid changing another checkout's global Nim packages.
+- `upstream` tracks the original CTF repo; `origin` is this fork. Do not run
+  upstream publish/upload tooling against live Paintbot leagues.
+- Preserve the upstream rules below when changing simulation sources.
+
 # Agent operating guide — coworld-ctf
 
 Orientation for coding agents (Claude Code, Codex, etc.) working in this

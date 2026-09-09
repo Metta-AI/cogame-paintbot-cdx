@@ -1,0 +1,27 @@
+name: Single-pod Paintbot
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  wasm-and-game:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Build game and WASM baseline
+        run: docker build -t paintbot-cdx:test .
+      - name: Install test tools
+        run: |
+          uv venv .venv
+          uv pip install --python .venv/bin/python -r singlepod/requirements.txt pytest ruff
+      - name: Check runtime and policy ABI
+        run: |
+          .venv/bin/ruff check singlepod --select E,F,I
+          .venv/bin/pytest -q singlepod/test_runtime.py
+      - name: Build native parity probe
+        run: |
+          docker build --target build -t paintbot-cdx:build .
+          docker run --rm -v "$PWD:/checks" paintbot-cdx:build sh -c 'nim c --hints:off -d:release -d:artlogNoCurl -o:/tmp/parity singlepod/parity.nim && /tmp/parity /checks/parity.jsonl'
+          .venv/bin/python singlepod/check_parity.py parity.jsonl
+      - name: Verify complete one-container episode
+        run: .venv/bin/python singlepod/container_smoke.py --image paintbot-cdx:test

@@ -29,6 +29,8 @@ These are resource bounds, not policy-strength measurements.
 
 `singlepod/test.sh` and `singlepod/container_smoke.py` reproduce the core checks.
 The workflow in `.github/workflows/single-pod.yml` builds and tests on Linux.
-Hosted Coworld certification/deployment and league changes are not part of
-these local results. Vet could not review because no API credentials were
-available; compiler checks, lint, adversarial tests and integration tests ran.
+Hosted version 0.1.1 subsequently passed all five upload-smoke episodes and
+certification. A full 16-seat `2v2` episode also completed with 16 successful
+player exits and a replay. See [hosted verification](HOSTED.md) for immutable
+IDs and league settings. Vet could not review because no API credentials
+were available; compiler checks, lint, adversarial tests and integration tests ran.

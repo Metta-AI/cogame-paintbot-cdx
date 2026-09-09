@@ -62,3 +62,7 @@ The first hosted candidate exposed an upstream name-normalization mismatch
 when duplicate policy names receive a ` (2)` suffix. The host now authenticates
 with slot and token, letting the engine use its configured roster name.
 `container_smoke.py` covers that exact regression. The hosted CPU limit is 6.
+
+Campaign round 1 completed with all 16 WASM seats exiting cleanly; Explorer
+captured the first cell. The round and episode IDs are recorded in
+[campaign.json](campaign.json).

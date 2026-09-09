@@ -67,5 +67,13 @@
       "policy_id": "2cf0bdd4-6bc2-4ead-8b76-26366f65aa95"
     }
   ],
-  "first_campaign_round_id": "round_05d301af-fe7e-4d4b-980c-34c64aba1de0"
+  "first_campaign_round_id": "round_05d301af-fe7e-4d4b-980c-34c64aba1de0",
+  "first_campaign_verification": {
+    "round": 1,
+    "status": "completed",
+    "episode_id": "ereq_3a3d7630-aef2-4865-afe4-dc11710be139",
+    "job_id": "3f225616-8dad-4ce9-842e-55238afb98cb",
+    "successful_seats": 16,
+    "territory_winner": "paintbot-cdx-explorer"
+  }
 }

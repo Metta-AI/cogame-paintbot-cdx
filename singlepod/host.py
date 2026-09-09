@@ -167,11 +167,11 @@ def run(args: argparse.Namespace) -> int:
             try:
                 with log_path.open("w") as log:
                     policy = Policy(engine, module, slot)
+                    # The engine resolves display names from the authenticated roster.
                     query = urlencode(
                         {
                             "slot": slot,
                             "token": tokens[slot],
-                            "name": config["players"][slot]["name"],
                         }
                     )
                     with connect(

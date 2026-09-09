@@ -44,6 +44,10 @@ def main():
             seed=7,
             barrageMaxPerSec=0,
         )
+        config["players"] = [
+            {"name": "coworld-smoke/test:v1"},
+            {"name": "coworld-smoke/test:v1 (2)"},
+        ]
         (root / "config.json").write_text(json.dumps(config))
         seats = [
             {

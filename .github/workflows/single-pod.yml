@@ -16,7 +16,7 @@ jobs:
           uv pip install --python .venv/bin/python -r singlepod/requirements.txt pytest ruff
       - name: Check runtime and policy ABI
         run: |
-          .venv/bin/ruff check singlepod --select E,F,I
+          .venv/bin/ruff check singlepod --select E,F,I --line-length 120
           .venv/bin/pytest -q singlepod/test_runtime.py
       - name: Build native parity probe
         run: |

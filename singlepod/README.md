@@ -86,7 +86,8 @@ with `1v1`, `2v2`, and `4ffa`. The former campaign league
 its campaign flag disabled. The campaign/landscape boards and scheduling live
 in Coworld, outside this game repository; this port supplies their game variants
 and leaves those upstream leagues unchanged. The new `paintbot-cdx` league
-uses the `2v2` variant; see [hosted deployment and submission](HOSTED.md).
+runs campaign on `1v1`, `2v2`, and `4ffa`, with three seeded baseline opponents;
+see [hosted deployment and submission](HOSTED.md).
 
 File policies here control Sprite v1 actuators. The deprecated LLM squad KOTH
 variant and Season 2 play-seat variants are retained in the reference manifest,

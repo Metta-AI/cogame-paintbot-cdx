@@ -1,0 +1,71 @@
+{
+  "league_id": "league_4ed17e4d-9844-456a-8ac4-ab1120bb8a4e",
+  "campaign": {
+    "enabled": true,
+    "outcomes": "episodes",
+    "variant_ids": [
+      "1v1",
+      "2v2",
+      "4ffa"
+    ],
+    "episode_timeout_seconds": 1800,
+    "board": {
+      "width": 10,
+      "height": 10,
+      "board_shape": "hex",
+      "blobs": false,
+      "board_outline": "grid",
+      "mode_mix": {
+        "2v2": 0.5,
+        "ffa4": 0.5
+      },
+      "mode_layout": "scattered"
+    },
+    "max_invasions": 3,
+    "min_airdrops": 1,
+    "max_airdrops": 1,
+    "baseline_policy_version_id": "c8991ce0-0a2e-4e86-b556-906388c0eca2",
+    "best_of": 1,
+    "round_interval_seconds": 300,
+    "max_frames": 500,
+    "conversation_rounds": 10,
+    "strategist": {
+      "model": "us.anthropic.claude-sonnet-5",
+      "max_tokens": 1500,
+      "max_tool_calls": 16,
+      "timeout_seconds": 90.0,
+      "default_prompt": "Expand cautiously. Prefer weak neighbors and empty cells; avoid fights you keep losing.",
+      "aws_profile": null,
+      "aws_region": "us-east-1"
+    },
+    "emulation": {
+      "ratings": {},
+      "default_rating": 1200.0,
+      "red_advantage": 60.0,
+      "style_sigma": 100.0,
+      "filler_elo": 800.0,
+      "seed": 1
+    }
+  },
+  "seeded_opponents": [
+    {
+      "name": "paintbot-cdx-rusher",
+      "player_id": "ply_d6c26e05-5e3a-46ce-aa5d-2dd25902e424",
+      "policy_version_id": "5693ef77-c533-4be2-b21f-afc101ebd5ff",
+      "policy_id": "75ca5187-6705-45de-818e-cab2be9f0550"
+    },
+    {
+      "name": "paintbot-cdx-guardian",
+      "player_id": "ply_ec1a3a4c-939d-4ce5-9e44-e70e2853f8fd",
+      "policy_version_id": "1afefb31-54bf-4c41-9dc2-dd1a8fb2c057",
+      "policy_id": "5e1b4d34-f96d-4d93-853c-1e6dce71f797"
+    },
+    {
+      "name": "paintbot-cdx-explorer",
+      "player_id": "ply_ca58ea18-ab88-4074-a1b9-8b06adeb3eea",
+      "policy_version_id": "5aa938e2-de97-47f5-8dab-bb4d502d0b0f",
+      "policy_id": "2cf0bdd4-6bc2-4ead-8b76-26366f65aa95"
+    }
+  ],
+  "first_campaign_round_id": "round_05d301af-fe7e-4d4b-980c-34c64aba1de0"
+}

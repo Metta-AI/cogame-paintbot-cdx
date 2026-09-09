@@ -13,12 +13,21 @@ Created and verified on 2026-09-09.
 - Filler: `paintbot-cdx-baseline:v1`, policy version `c8991ce0-0a2e-4e86-b556-906388c0eca2`.
 - Baseline file SHA-256: `135538c4a166f3f0ac370204c6c0b90ddd7ed825490e1cc161fa161a8640c2e9`.
 
-The platform Elo ladder runs the `2v2` variant: four entrants, four cogs per
-entrant, 16 seats. Entrants 0/2 and 1/3 are allied; seat assignment is
-interleaved. The WASM baseline fills missing entrants. Each round contains up
-to three matchups, with a 288-minute interval (at most five rounds per day),
-a $15/day Coworld envelope, and 100 initial operating credits ($10).
-No recurring credit grant or cash rewards are configured.
+The campaign round engine runs real single-pod episodes on a 10×10 hex-cell
+board, using `1v1`, `2v2`, and `4ffa` maps. The Elo ladder is disabled.
+Campaign rounds start five minutes after the previous round finishes.
+The WASM baseline defends empty cells and supplies allied seats.
+
+Three Coworld-owned baseline opponents are active champions:
+`paintbot-cdx-rusher:v1`, `paintbot-cdx-guardian:v1`, and
+`paintbot-cdx-explorer:v1`. They share the tested baseline combat policy and
+have different campaign strategist prompts. Daveey's submitted Focusfire
+WASM agent competes alongside them. These are competing campaign entrants;
+the ladder's reserved FFA seed-seat setting does not drive campaign rosters.
+Exact policy IDs and campaign settings are in [campaign.json](campaign.json).
+
+The Coworld retains its $15/day envelope and 100 initial operating credits
+($10). No recurring credit grant or cash rewards are configured.
 
 ## Submit a WASM policy
 

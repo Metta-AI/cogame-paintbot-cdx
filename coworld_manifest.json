@@ -32,7 +32,7 @@
           "memory": "2Gi"
         },
         "limits": {
-          "cpu": "8",
+          "cpu": "6",
           "memory": "12Gi"
         }
       }

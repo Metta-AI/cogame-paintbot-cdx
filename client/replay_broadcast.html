@@ -1210,6 +1210,16 @@ body.commswide #viewport { justify-content: flex-end; }
   margin-bottom: calc(8 * var(--u));
   flex: none;
 }
+#commsToggle {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+#commsToggle:focus-visible { outline: 2px solid var(--paper-dim); outline-offset: 4px; }
+#lane-l #commsdock:not(.expanded) { flex: none; }
+#lane-l #commsdock:not(.expanded) > :not(.cd-head) { display: none; }
 #commsFeed {
   overflow-y: auto;
   display: flex;
@@ -1340,10 +1350,8 @@ body.sidelanes #scorebug .br-cell-glory { margin-left: auto; }
 body.sidelanes #scorebug .plate.side-r { flex-direction: row; text-align: left; }
 body.sidelanes #scorebug .plate.side-r .lives-line { flex-direction: row-reverse; }
 body.sidelanes #scorebug .plate.side-r .glory-line { flex-direction: row-reverse; }
-/* The comms/huddle surface fills the rest of the rail. The chat column
-   belongs here even when nobody spoke (owner spec) — relayout() opens the
-   dock in sidelanes regardless of comms, and the :empty state names the
-   silence instead of showing a bare hole. */
+/* Comms starts collapsed. Expanding it fills the rest of the rail;
+   an empty transcript shows the quiet-lobby message. */
 body.sidelanes #commsdock {
   display: flex;
   background: none;
@@ -2843,7 +2851,7 @@ body[data-noviewpanel] #viewpanel { display: none !important; }
 <div id="viewport">
 <div id="lane-l">
 <div id="commsdock">
-  <div class="cd-head">Comms</div>
+  <button class="cd-head" id="commsToggle" type="button" aria-expanded="false" aria-controls="commsFeed">▸ Comms</button>
   <div id="commsFeed"></div>
   <div class="cd-empty">The lobby is quiet — no huddle chatter this match.</div>
   <button id="commsLive">▾ Jump to live</button>
@@ -6231,6 +6239,17 @@ body[data-noviewpanel] #viewpanel { display: none !important; }
   var huddlePanelEl = $('huddlePanel'), huddleLinesEl = $('huddleLines');
   var huddleChipEl = $('huddleChip'), huddleUnreadEl = $('huddleUnread');
   var commsFeedEl = $('commsFeed'), commsLiveEl = $('commsLive');
+  var commsDockEl = $('commsdock'), commsToggleEl = $('commsToggle');
+  // Keep Space on this button from triggering the replay's playback shortcut.
+  commsToggleEl.addEventListener('keydown', function (ev) {
+    if (ev.key === ' ' || ev.key === 'Enter') ev.stopPropagation();
+  });
+  commsToggleEl.addEventListener('click', function () {
+    var expanded = commsDockEl.classList.toggle('expanded');
+    commsToggleEl.setAttribute('aria-expanded', String(expanded));
+    commsToggleEl.textContent = (expanded ? '▾' : '▸') + ' Comms';
+    if (expanded && commsPinned) commsFeedEl.scrollTop = commsFeedEl.scrollHeight;
+  });
 
   var byOrd = function (a, b) { return (a.ord || 0) - (b.ord || 0); };
   var byMs = function (a, b) { return (a.ms || 0) - (b.ms || 0) || (a.ord || 0) - (b.ord || 0); };

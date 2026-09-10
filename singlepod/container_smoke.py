@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import tempfile
 from pathlib import Path
@@ -75,6 +76,8 @@ def main():
             "--rm",
             "--network",
             "none",
+            "--user",
+            f"{os.getuid()}:{os.getgid()}",
             "--memory",
             "3g",
             "--cpus",

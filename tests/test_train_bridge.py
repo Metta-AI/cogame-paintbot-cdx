@@ -12,14 +12,14 @@ MANIFEST = ROOT / "coworld_manifest.json"
 
 
 def main() -> None:
-    binary = sys.argv[1]
+    binary = str(Path(sys.argv[1]).resolve())
     variants = json.loads(MANIFEST.read_text())["variants"]
     for variant in variants:
         seats = variant["game_config"]["num_agents"]
         for policy in ("teacher", "random"):
             with subprocess.Popen(
                 [binary, str(MANIFEST), variant["id"], "32"],
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, cwd=ROOT,
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, cwd="/",
             ) as process:
                 def call(request):
                     process.stdin.write(json.dumps(request) + "\n")

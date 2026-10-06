@@ -112,23 +112,11 @@ detect the collision**, because the colliding branch and the base BOTH read
 "42". What distinguishes them is the RULE the number is attached to, so the
 script diffs the headline on the changelog comment, not the digits.
 
-It is **not yet wired into CI** — that needs a human, because cubi tokens lack
-GitHub's `workflows` permission and a bot cannot modify `.github/workflows/`.
-To wire it up, add this to the `build` job in
-`.github/workflows/build.yml` (details:
-https://github.com/Metta-AI/coworld-ctf/issues/268 — cite full URLs here, not a
-bare `#N`: softmax runs both GitHub and Forgejo with independently numbered
-issues, so a bare number resolves against whichever host the reader is on):
-
-```yaml
-      - name: GameVersion is not a number the base already spent
-        if: github.event_name == 'pull_request'
-        run: |
-          git fetch --no-tags --depth=1 origin '${{ github.base_ref }}'
-          tools/ci/check_gameversion.sh FETCH_HEAD
-```
-
-Until that lands, run the script by hand before you claim a version.
+This fork's workflow is `.github/workflows/single-pod.yml`; it does not run
+this version guard. Run the script locally before claiming a version.
+If adding the guard to CI, use this fork's actual workflow and verify the
+current token's permissions. Do not assume an old bot-token limitation applies.
+The upstream discussion is https://github.com/Metta-AI/coworld-ctf/issues/268.
 
 The changelog comment on `GameVersion` is the other half of this: it is a
 prepend-only history, so **say what the number means and what it obsoletes**.
@@ -525,72 +513,21 @@ full config JSON it was recorded with. Gotchas:
   902 → 905 → 908 → 907, and some of that walking was probably this
   nondeterminism, not the rule changes it was blamed on.
 
-## Operating the prod league (settings, fillers, pause, retire)
+## Hosted operation and replay debugging
 
-Read `docs/recon/observatory-permission-model-2026-09-02.md` before touching league
-state; the Season 2 retrospective (`docs/reports/s2-permissions-retrospective-2026-09-02.md`)
-records what it cost to guess. The short version:
+This fork does not own upstream production leagues. Local build or test work
+does not authorize changing league settings, fillers, credentials, or deployments.
+Use the public [Coworld guide](https://softmax.com/docs/coworld/overview) and
+installed CLI help for current authentication and episode-artifact retrieval.
+Inspect `coworld episodes --help`, `coworld replays --help`, and
+`coworld episode-logs --help`; use artifact URLs returned by the service rather
+than assuming a storage bucket or every replay's visibility.
 
-- API base is `https://softmax.com/api/observatory`; `/api/v2/...` returns an HTML 404.
-- James's user token is not a league owner. Send `X-Use-Elevated-Privileges: true`
-  (CLI: `coworld --elevated`) on every league read or write; without it a team
-  member's token is an ordinary user token. A `ply_` session (after
-  `coworld player use`) cannot manage leagues or use `--elevated`.
-- `POST /v2/leagues/{id}/settings` replaces the whole document with no version
-  check and no actor audit: GET, snapshot, modify, POST, read back, and post a
-  one-line intent in `docs/coordination/agents-notes.md` first. Announcing is
-  notification, not a request for approval.
-- The filler list is `POST /v2/leagues/{id}/filler-policies`; pool credits are on
-  `GET /v2/leagues/{id}/owner-status` (an unfunded pool skips rounds silently);
-  retire or re-enable a seeded league with
-  `PATCH /v2/coworld-league-seeds/{lseed_...} {"enabled": ...}`, not a DB write.
-- Disabled and private leagues 404 everywhere by design. `GET /v2/rounds` takes
-  `league_id`; unknown query parameters are dropped silently.
-- Season 2's round scoring rule has changed seven times, four of them with no
-  build bump; a standings or Glory number quoted across one of those boundaries
-  is an artifact, not a result. [docs/SCORING_ERAS.md](docs/SCORING_ERAS.md) is
-  the era table — round, timestamp, canonical build, and what a cross-boundary
-  read gets wrong. Stamp every scoring claim with a round range and a
-  `coworld_version`.
+For local deterministic replay debugging, `parseReplayBytes` and
+`initReplayRuntime` consume the recorded configuration and inputs. The replay
+contains its resolved map, teams, and player names. Use
+`tools/wasm_replay_smoke.cjs` for the viewer smoke path. Preserve the replay and
+record its game version, source episode, and reproduction command with findings.
 
-## Debugging prod league replays (don't drive the Observatory UI)
-
-To investigate a prod replay issue, download the replay bytes directly —
-never try to navigate softmax.com/observatory in a browser (sign-in wall,
-and the UI adds nothing). The Observatory URL carries everything needed:
-`?tab=coworlds&logscope=league:league_<uuid>&detail=league:league_<uuid>` —
-the `detail` param is the league being viewed (strip the `league_` prefix
-for SQL; `leagues.id` is the bare uuid).
-
-1. Query the prod DB via the read-only `/sql` endpoint (token from
-   `~/.softmax/credentials.yaml`, key `https://softmax.com/api`; add headers
-   `Authorization: Bearer $TOKEN` and `X-Use-Elevated-Privileges: true`,
-   POST to `https://softmax.com/api/observatory/sql/query`):
-
-   ```sql
-   -- league -> divisions -> rounds -> episode requests -> job ids
-   SELECT era.job_request_id, er.created_at,
-          er.game_config->>'teams' AS teams
-   FROM episode_requests er
-   JOIN episode_request_attempts era ON era.episode_request_id = er.id
-   JOIN rounds r ON r.id = er.round_id
-   JOIN divisions d ON d.id = r.division_id
-   WHERE d.league_id = '<league uuid without prefix>'
-   ORDER BY er.created_at DESC;
-   ```
-
-2. Every job's replay is public:
-   `https://softmax-public.s3.amazonaws.com/replays/<job_request_id>.replay`
-   (equivalently `episodes.replay_url`, joined via `episode_jobs`).
-
-3. The file is `COWLDCTF` deterministic format: a JSON config (brace-match
-   from the first `{`; includes `mapSpec` dims/layout, teams, player names)
-   plus recorded inputs — `parseReplayBytes` + `initReplayRuntime` replays
-   it locally, exactly like the wasm viewer.
-
-4. To reproduce the hosted viewer itself:
-   `POST https://softmax.com/api/observatory/v2/coworlds/replays/session`
-   with `{"coworld_id": "<episode_requests.coworld_id>", "replay_uri": "<s3 url>"}`
-   returns the exact static-bundle `viewer_url` prod serves (its
-   `broadcast_core.js` / wasm files are directly downloadable, and the
-   wasm bundle runs headless under Node — see `tools/wasm_replay_smoke.cjs`).
+Stamp scoring claims with a round range and game version. Consult
+`docs/SCORING_ERAS.md` before comparing results across rule changes.

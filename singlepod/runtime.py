@@ -16,6 +16,12 @@ MAX_FRAME = 16 * 1024 * 1024
 MAX_REPLY = 64 * 1024
 
 
+class PolicyReplyError(ValueError):
+    def __init__(self, message: str, reply: bytes):
+        super().__init__(message)
+        self.reply = reply
+
+
 def local_path(uri: str) -> Path:
     parsed = urlsplit(uri)
     if parsed.scheme == "file" and parsed.netloc in ("", "localhost"):
@@ -100,32 +106,32 @@ def write_json(uri: str, document: dict) -> None:
 
 def decode_replies(data: bytes) -> list[bytes]:
     if len(data) < 4 or len(data) > MAX_REPLY:
-        raise ValueError("invalid reply buffer size")
+        raise PolicyReplyError("invalid reply buffer size", data)
     count = struct.unpack_from("<I", data)[0]
     if count > 64:
-        raise ValueError("too many reply packets")
+        raise PolicyReplyError("too many reply packets", data)
     offset, replies = 4, []
     for _ in range(count):
         if offset + 4 > len(data):
-            raise ValueError("truncated reply length")
+            raise PolicyReplyError("truncated reply length", data)
         size = struct.unpack_from("<I", data, offset)[0]
         offset += 4
         if size == 0 or offset + size > len(data):
-            raise ValueError("truncated or empty reply packet")
+            raise PolicyReplyError("truncated or empty reply packet", data)
         reply = data[offset : offset + size]
         # A policy may control its actuator mask and shout, never join or claim another seat.
         if not (
             (reply[0] == 0x84 and size == 2) or (reply[0] == 0x81 and size <= 1024)
         ):
-            raise ValueError("unsupported player reply packet")
+            raise PolicyReplyError("unsupported player reply packet", data)
         if reply[0] == 0x81 and (
             size < 3 or struct.unpack_from("<H", reply, 1)[0] != size - 3
         ):
-            raise ValueError("invalid chat packet length")
+            raise PolicyReplyError("invalid chat packet length", data)
         replies.append(reply)
         offset += size
     if offset != len(data):
-        raise ValueError("trailing reply bytes")
+        raise PolicyReplyError("trailing reply bytes", data)
     return replies
 
 

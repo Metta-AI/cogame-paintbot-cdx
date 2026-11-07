@@ -1,7 +1,7 @@
 # Paintbot in one pod
 
 This repository ports the full Paintbot engine from
-[Metta-AI/coworld-ctf](https://github.com/Metta-AI/coworld-ctf), revision
+[softmax-universe/coworld-ctf](https://github.com/softmax-universe/coworld-ctf), revision
 `34ad7f3e` (2026-09-09; including the viewer updates merged during this port).
 
 One container runs the native game and a Python launcher. The launcher hosts all

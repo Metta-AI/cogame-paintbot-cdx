@@ -1,6 +1,6 @@
 # Single-pod Paintbot fork
 
-This repository is `Metta-AI/cogame-paintbot-cdx`. Its game package is
+This repository is `softmax-universe/cogame-paintbot-cdx`. Its game package is
 `coworld_manifest.json`; `coworld_manifest_paintbot.json` preserves the upstream
 manifest for reference. Build and test instructions are in `singlepod/README.md`.
 
@@ -116,7 +116,7 @@ This fork's workflow is `.github/workflows/single-pod.yml`; it does not run
 this version guard. Run the script locally before claiming a version.
 If adding the guard to CI, use this fork's actual workflow and verify the
 current token's permissions. Do not assume an old bot-token limitation applies.
-The upstream discussion is https://github.com/Metta-AI/coworld-ctf/issues/268.
+The upstream discussion is https://github.com/softmax-universe/coworld-ctf/issues/268.
 
 The changelog comment on `GameVersion` is the other half of this: it is a
 prepend-only history, so **say what the number means and what it obsoletes**.
@@ -145,7 +145,7 @@ instead of blending in.
 - `src/ctf/map_pool.nim` — GENERATED curated terrain-pool seeds; rewrite it
   only via `tools/gen_map_pool.nim`, never by hand.
 - Paintball King of the Hill — a deprecated config-gated squad mode merged
-  back from Metta-AI/cogame-paintball (docs/paintball/: RULES, PROTOCOL,
+  back from softmax-universe/cogame-paintball (docs/paintball/: RULES, PROTOCOL,
   COMMANDING, the design note). Since 0.7.253 live boot requires
   `allowDeprecatedModes: true`, and the published manifest no longer offers a
   paintball variant. Mode modules remain in `src/ctf/`: `paint.nim` (paint grid + hill),
@@ -341,7 +341,7 @@ about it. What a player's feet are on is the 96px pedestal disc.
 The other five pickups (grenade, med kit, shield, spray can, barrier) still
 use 12px against 18-26px sprites — a milder version of the same mismatch (at
 worst ~2x, vs the heart's 5x), deliberately left alone by GV42's scope. Filed
-as https://github.com/Metta-AI/coworld-ctf/issues/266 with the measurements.
+as https://github.com/softmax-universe/coworld-ctf/issues/266 with the measurements.
 
 ## Terrain
 

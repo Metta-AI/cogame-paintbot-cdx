@@ -11,6 +11,7 @@ import signal
 import subprocess
 import threading
 import time
+import zipfile
 from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -18,6 +19,7 @@ from urllib.request import urlopen
 import wasmtime
 from runtime import (
     Policy,
+    PolicyReplyError,
     load_seats,
     local_path,
     read_uri,
@@ -212,7 +214,30 @@ def run(args: argparse.Namespace) -> int:
                 message = f"{type(error).__name__}: {error}"[:1800]
                 with log_path.open("a") as log:
                     log.write(message + "\n")
-                errors.put((slot, message))
+                try:
+                    if isinstance(error, PolicyReplyError) and "artifact_uri" in seat:
+                        artifact = local_path(seat["artifact_uri"])
+                        artifact.parent.mkdir(parents=True, exist_ok=True)
+                        temporary = artifact.with_suffix(".partial")
+                        with zipfile.ZipFile(
+                            temporary, "w", zipfile.ZIP_DEFLATED
+                        ) as archive:
+                            archive.writestr("observation.bin", frame)
+                            archive.writestr("reply.bin", error.reply)
+                            archive.writestr(
+                                "failure.json",
+                                json.dumps(
+                                    {
+                                        "slot": slot,
+                                        "frame": frames + 1,
+                                        "content_hash": seat["content_hash"],
+                                        "error": str(error),
+                                    }
+                                ),
+                            )
+                        temporary.replace(artifact)
+                finally:
+                    errors.put((slot, message))
             finally:
                 if policy is not None:
                     policy.close()

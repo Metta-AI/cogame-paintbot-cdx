@@ -71,6 +71,9 @@ verified against its declared byte size and SHA-256 before the game starts.
 `file://`, local paths, HTTPS URLs (including presigned S3 URLs), and `s3://`
 are supported. Coworld normally downloads and verifies policy objects itself
 and supplies staged `file://` URIs, so the game needs no S3 access in that path.
-Logs and statuses are local output files. Optional policy-artifact ZIPs are not
-produced by this ABI. A failed guest is reported through
+Logs and statuses are local output files. A malformed reply writes one private
+policy-artifact ZIP when that seat has an artifact destination. It contains the
+fog-filtered `observation.bin` (at most 16 MiB), rejected `reply.bin` (at most
+64 KiB), and `failure.json` with the slot, frame number, policy hash, and error.
+No artifact is written for successful play. A failed guest is reported through
 `COGAME_PLAYER_FAILURE_URI` and `player_status_uri`.
